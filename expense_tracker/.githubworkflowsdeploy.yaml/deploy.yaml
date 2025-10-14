@@ -1,8 +1,30 @@
+name: CI/CD Flask Expense Tracker
+
 on:
   push:
-    branches: 
-    -devlop
+    branches: [ "develop" ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8
+
+    - name: Lint Python code
+      run: flake8 . --max-line-length=88
+
+    - name: Build Docker image
+      run: docker build -t expense-tracker:latest .
